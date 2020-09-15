@@ -3,11 +3,19 @@ setup:
 	pip install --force-reinstall -r requirements/requirements-dev.txt
 
 .PHONY: lint
-lint: lint-shell
+lint: lint-shell lint-python lint-docker
 
 .PHONY: lint-shell
 lint-shell:
-	shellcheck ./dev/*.sh
+	bash ./dev/lint_shell.sh
+
+.PHONY: lint-python
+lint-python:
+	bash ./dev/lint_python.sh
+
+.PHONY: lint-docker
+lint-docker:
+	bash ./dev/lint_dockerfiles.sh
 
 .PHONEY: test
 test:

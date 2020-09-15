@@ -6,16 +6,16 @@ version: 2
 #
 references:
   common-env-vars: &common-env-vars
-    DOCKER_USER: "yuiskw"
+    DOCKERHUB_USER: "yuiskw"
 
   working_directory: &working_directory
-    /workspace/project
+    ~/project
 
   docker-images:
     python-image: &python-image
       working_directory: *working_directory
       docker:
-        - image: python:3.8
+        - image: circleci/python:3.8.5
           environment:
             <<: *common-env-vars
     hadolint: &hadolint-image
@@ -33,13 +33,22 @@ references:
     install-libraries: &install-libraries
       name: Set up environment
       command: |
-        apt-get update -y \
-            && apt-get install -y build-essential yamllint python3 python3-dev shellcheck
-        make setup
+        sudo apt-get update -y \
+            && sudo apt-get install -y build-essential yamllint
+    install-python3: &install-python3
+      name: Install python3
+      command: |
+        sudo apt-get update -y \
+            && sudo apt-get install -y python3 python3-dev
+    install-shellcheck: &install-shellcheck
+      name: Install shellcheck
+      command: |
+        sudo apt-get update -y \
+            && sudo apt-get install -y shellcheck
     activate-dockerhub: &activate-dockerhub
       name: Activate Docker Hub account
       command: |
-        docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+        docker login -u "${DOCKERHUB_USER}" -p "${DOCKERHUB_PASSWORD}"
 
 #
 # jobs
@@ -52,9 +61,11 @@ jobs:
       - run:
           <<: *install-libraries
       - run:
+          <<: *install-shellcheck
+      - run:
           name: Run shellcheck
           command: |
-            make lint-shell
+            bash ./dev/lint_shell.sh
 
   lint-dockerfiles:
     <<: *hadolint-image
@@ -67,7 +78,7 @@ jobs:
       - run:
           name: Run hadolint
           command: |
-            bash ./ci/lint_dockerfiles.sh
+            bash ./dev/lint_dockerfiles.sh
 
   lint-and-test-python:
     <<: *python-image
@@ -76,13 +87,13 @@ jobs:
       - run:
           <<: *install-libraries
       - run:
-          name: Lint shell
-          command: |
-            make lint-shell
-      - run:
           name: Set up
           command: |
-            pip install -r requirements/requirements-dev.txt
+            make setup
+      - run:
+          name: Lint python
+          command: |
+            make lint-python
       - run:
           name: Find unsecure modules with safety
           command: |
@@ -101,28 +112,28 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker:
-          docker_layer_caching: true
+          version: 19.03.12
       - run:
           <<: *activate-dockerhub
       - run:
           name: Build and push docker image with dbt in prod
           command: |
             COMMIT_REF=$(git describe --always)
-            bash ./ci/build_dbt-helper_docker.sh "build" "${COMMIT_REF}"
+            bash ./dev/build_docker.sh "build" "${COMMIT_REF}"
 
   push-docker:
     <<: *python-image
     steps:
       - checkout
       - setup_remote_docker:
-          docker_layer_caching: true
+          version: 19.03.12
       - run:
           <<: *activate-dockerhub
       - run:
           name: Build and push docker image with dbt in prod
           command: |
             GIT_TAG=${CIRCLE_TAG:?}
-            bash ./ci/build_dbt-helper_docker.sh "push" "${TAG}"
+            bash ./dev/build_docker.sh "push" "${TAG}"
 
 #
 # Workflows
@@ -150,6 +161,7 @@ workflows:
             tags:
               only: /.*/
       - build-docker:
+          # Trigger in any branch
           filters:
             branches:
               only: /.*/
@@ -157,13 +169,16 @@ workflows:
               ignore: /.*/
           requires:
             - lint-shell
+            - lint-dockerfiles
             - lint-and-test-python
       - push-docker:
+          # Trigger when tagging
           filters:
             branches:
-              ignore: /.*
+              ignore: /.*/
             tags:
               only: /.*/
           requires:
             - lint-shell
+            - lint-dockerfiles
             - lint-and-test-python

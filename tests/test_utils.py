@@ -1,6 +1,5 @@
 import os
 import unittest
-from pprint import pprint
 
 from bigquery_lineage.utils import (
     get_project_root
