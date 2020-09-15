@@ -5,7 +5,7 @@ SET end_date = DATE("{{ end_date }}");
 WITH
 insert_jobs AS (
   SELECT *
-  FROM `{{ project }}.bigquery_resource_log.cloudaudit_googleapis_com_data_access_*`
+  FROM `{{ project }}.{{ dataset }}.cloudaudit_googleapis_com_data_access_*`
   WHERE
     _TABLE_SUFFIX BETWEEN FORMAT_DATE('%Y%m%d', start_date)
                       AND FORMAT_DATE('%Y%m%d', end_date)

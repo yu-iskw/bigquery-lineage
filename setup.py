@@ -26,9 +26,10 @@ setup(
     install_requires=[
         "click==7.1.2",
         "click-completion==0.5.2",
-        "google-cloud-bigquery>=1.26.0",
         "dictdiffer==0.8.1",
         "Jinja2>=2.11",
+        "google-cloud-bigquery>=1.26.0",
+        "google-api-python-client>=1.12.1",
     ],
     entry_points={
         "console_scripts": [

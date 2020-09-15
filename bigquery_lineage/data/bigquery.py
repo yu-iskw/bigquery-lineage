@@ -12,6 +12,9 @@ from google.cloud import bigquery
 from bigquery_lineage.logger import get_logger
 
 
+AUDITLOG_FILE_NAME = "auditlog.pickle"
+
+
 def build_query_job_config(**kwargs) -> bigquery.QueryJobConfig:
     """Build bigquery.QueryJobConfig."""
     default = {
@@ -101,7 +104,7 @@ class BigQueryDataCollector:
     def save_results(
             path: str,
             query_job: bigquery.QueryJob,
-            filename="auditlog.pickle") -> str:
+            filename=AUDITLOG_FILE_NAME) -> str:
         """Save a query result to a file."""
         saved_dir = os.path.join(path, query_job.project)
         saved_path = os.path.join(saved_dir, filename)
