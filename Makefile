@@ -13,6 +13,10 @@ lint-shell:
 lint-python:
 	pylint -v bigquery_lineage tests
 
+.PHONY: lint-docker
+lint-docker:
+	bash ./dev/lint_dockerfiles.sh
+
 .PHONEY: test
 test:
 	pytest -v -s --cache-clear tests/

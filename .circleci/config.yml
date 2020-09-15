@@ -67,7 +67,7 @@ jobs:
       - run:
           name: Run hadolint
           command: |
-            bash ./ci/lint_dockerfiles.sh
+            bash ./dev/lint_dockerfiles.sh
 
   lint-and-test-python:
     <<: *python-image
@@ -108,7 +108,7 @@ jobs:
           name: Build and push docker image with dbt in prod
           command: |
             COMMIT_REF=$(git describe --always)
-            bash ./ci/build_dbt-helper_docker.sh "build" "${COMMIT_REF}"
+            bash ./dev/build_dbt-helper_docker.sh "build" "${COMMIT_REF}"
 
   push-docker:
     <<: *python-image
@@ -122,7 +122,7 @@ jobs:
           name: Build and push docker image with dbt in prod
           command: |
             GIT_TAG=${CIRCLE_TAG:?}
-            bash ./ci/build_dbt-helper_docker.sh "push" "${TAG}"
+            bash ./dev/build_dbt-helper_docker.sh "push" "${TAG}"
 
 #
 # Workflows
