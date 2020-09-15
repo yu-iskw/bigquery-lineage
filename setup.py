@@ -28,6 +28,7 @@ setup(
         "click-completion==0.5.2",
         "google-cloud-bigquery>=1.26.0",
         "dictdiffer==0.8.1",
+        "Jinja2>=2.11",
     ],
     entry_points={
         "console_scripts": [

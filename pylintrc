@@ -140,6 +140,7 @@ disable=apply-builtin,
         xrange-builtin,
         zip-builtin-not-iterating,
         missing-module-docstring,
+        missing-class-docstring,
 
 
 [REPORTS]
