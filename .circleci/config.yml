@@ -65,7 +65,7 @@ jobs:
       - run:
           name: Run shellcheck
           command: |
-            make lint-shell
+            bash ./dev/lint_shell.sh
 
   lint-dockerfiles:
     <<: *hadolint-image
