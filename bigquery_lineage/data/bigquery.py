@@ -2,7 +2,6 @@
 from __future__ import absolute_import, division, print_function
 
 import os
-import logging
 import pickle
 from typing import List
 import json
@@ -10,8 +9,11 @@ import json
 import jinja2
 from google.cloud import bigquery
 
+from bigquery_lineage.logger import get_logger
+
 
 def build_query_job_config(**kwargs) -> bigquery.QueryJobConfig:
+    """Build bigquery.QueryJobConfig."""
     default = {
         "dry_run": False,
         "allow_large_results": True,
@@ -81,16 +83,18 @@ class BigQueryDataCollector:
         return queries
 
     def run(self, dry_run: bool) -> None:
+        """Run the application."""
+        logger = get_logger()
+
         for project in self._projects:
             query = self.generate_query(
                 project=project, start_date=self._start_date,
                 end_date=self._end_date, limit=self._limit)
+            logger.info(query)
+
             query_job = self.execute_query(
                 project=project, query=query, job_config=self._job_config)
-            logging.info(query_job.query_plan)
             if dry_run is False:
-                query_job = self.execute_query(
-                    project=project, query=query, job_config=self._job_config)
                 self.save_results(path=self._output, query_job=query_job)
 
     @staticmethod
@@ -102,6 +106,7 @@ class BigQueryDataCollector:
         saved_dir = os.path.join(path, query_job.project)
         saved_path = os.path.join(saved_dir, filename)
         os.makedirs(saved_dir, exist_ok=True)
+        # pylint: disable=unnecessary-comprehension
         results = [row for row in query_job.result()]
         with open(saved_path, "wb") as fp:
             pickle.dump(results, fp)
@@ -109,6 +114,7 @@ class BigQueryDataCollector:
 
     @staticmethod
     def load_results(path: str) -> List[bigquery.Row]:
+        """Load a query result."""
         with open(path, "rb") as fp:
             return pickle.load(fp)
 
