@@ -119,7 +119,7 @@ jobs:
           name: Build and push docker image with dbt in prod
           command: |
             COMMIT_REF=$(git describe --always)
-            bash ./dev/build_dbt-helper_docker.sh "build" "${COMMIT_REF}"
+            bash ./dev/build_docker.sh "build" "${COMMIT_REF}"
 
   push-docker:
     <<: *python-image
@@ -133,7 +133,7 @@ jobs:
           name: Build and push docker image with dbt in prod
           command: |
             GIT_TAG=${CIRCLE_TAG:?}
-            bash ./dev/build_dbt-helper_docker.sh "push" "${TAG}"
+            bash ./dev/build_docker.sh "push" "${TAG}"
 
 #
 # Workflows
