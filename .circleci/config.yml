@@ -116,7 +116,7 @@ jobs:
       - run:
           <<: *activate-dockerhub
       - run:
-          name: Build and push docker image with dbt in prod
+          name: Build docker image
           command: |
             COMMIT_REF=$(git describe --always)
             bash ./dev/build_docker.sh "build" "${COMMIT_REF}"
@@ -130,7 +130,7 @@ jobs:
       - run:
           <<: *activate-dockerhub
       - run:
-          name: Build and push docker image with dbt in prod
+          name: Build and push docker image
           command: |
             GIT_TAG=${CIRCLE_TAG:?}
             bash ./dev/build_docker.sh "push" "${TAG}"
