@@ -6,7 +6,7 @@ version: 2
 #
 references:
   common-env-vars: &common-env-vars
-    DOCKER_USER: "yuiskw"
+    DOCKERHUB_USER: "yuiskw"
 
   working_directory: &working_directory
     /workspace/project
@@ -39,7 +39,7 @@ references:
     activate-dockerhub: &activate-dockerhub
       name: Activate Docker Hub account
       command: |
-        docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+        docker login -u "${DOCKERHUB_USER}" -p "${DOCKERHUB_PASSWORD}"
 
 #
 # jobs
