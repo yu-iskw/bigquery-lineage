@@ -4,6 +4,9 @@ from __future__ import absolute_import, division, print_function
 import click
 import click_completion
 
+from .data import data
+from .completion import completion
+
 # Initialize click-completion
 click_completion.init()
 
@@ -23,4 +26,6 @@ def cli(context):
 
 
 # Add sub commands
-#cli.add_command(TBD)
+cli.add_command(data)
+cli.add_command(completion)
+
