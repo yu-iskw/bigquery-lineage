@@ -5,6 +5,7 @@ import click
 import click_completion
 
 from .data import data
+from .extract import extract
 from .completion import completion
 
 # Initialize click-completion
@@ -27,5 +28,6 @@ def cli(context):
 
 # Add sub commands
 cli.add_command(data)
+cli.add_command(extract)
 cli.add_command(completion)
 

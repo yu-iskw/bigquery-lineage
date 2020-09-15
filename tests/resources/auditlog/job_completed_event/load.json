@@ -1,0 +1,122 @@
+{
+  "logName": "projects/dummy-project/logs/cloudaudit.googleapis.com%2Fdata_access",
+  "resource": {
+    "type": "bigquery_resource",
+    "labels": {
+      "project_id": "dummy-project"
+    }
+  },
+  "protopayload_auditlog": {
+    "serviceName": "bigquery.googleapis.com",
+    "methodName": "jobservice.jobcompleted",
+    "resourceName": "projects/dummy-project/jobs/job_-1AYqKygndsrWE6oKSFZsqhoyEo2",
+    "resourceLocation": null,
+    "numResponseItems": null,
+    "status": null,
+    "authenticationInfo": {
+      "principalEmail": "service@service.iam.gserviceaccount.com",
+      "authoritySelector": null,
+      "serviceAccountKeyName": null,
+      "serviceAccountDelegationInfo": []
+    },
+    "authorizationInfo": [],
+    "requestMetadata": {
+      "callerIp": "35.187.203.219",
+      "callerSuppliedUserAgent": "airflow/1.10.9 (gzip),gzip(gfe)",
+      "callerNetwork": "//compute.googleapis.com/projects/vpc/global/networks/__unknown__",
+      "requestAttributes": null,
+      "destinationAttributes": null
+    },
+    "servicedata_v1_bigquery": {
+      "tableInsertRequest": null,
+      "tableUpdateRequest": null,
+      "datasetListRequest": null,
+      "datasetInsertRequest": null,
+      "datasetUpdateRequest": null,
+      "jobInsertRequest": null,
+      "jobQueryRequest": null,
+      "jobGetQueryResultsRequest": null,
+      "tableDataListRequest": null,
+      "setIamPolicyRequest": null,
+      "tableInsertResponse": null,
+      "tableUpdateResponse": null,
+      "datasetInsertResponse": null,
+      "datasetUpdateResponse": null,
+      "jobInsertResponse": null,
+      "jobQueryResponse": null,
+      "jobGetQueryResultsResponse": null,
+      "jobQueryDoneResponse": null,
+      "policyResponse": null,
+      "jobCompletedEvent": {
+        "eventName": "load_job_completed",
+        "job": {
+          "jobName": {
+            "projectId": "dummy-project",
+            "jobId": "job_-1AYqKygndsrWE6oKSFZsqhoyEo2",
+            "location": "US"
+          },
+          "jobConfiguration": {
+            "query": null,
+            "load": {
+              "sourceUris": [
+                "gs://datalake/spanner/dag_name=dag1/task_id=ScheduledRepaymentSettings/year=2020/month=8/day=1/hour=0/20200801000000-*.avro",
+                "gs://datalake/spanner/dag_name=dag1/task_id=ScheduledRepaymentSettings/year=2020/month=8/day=1/hour=0/20200801000000-*.snappy"
+              ],
+              "schemaJson": "{\n}",
+              "destinationTable": {
+                "projectId": "dummy-project",
+                "datasetId": "service",
+                "tableId": "table"
+              },
+              "createDisposition": "CREATE_IF_NEEDED",
+              "writeDisposition": "WRITE_TRUNCATE",
+              "destinationTableEncryption": null
+            },
+            "extract": null,
+            "tableCopy": null,
+            "dryRun": null,
+            "labels": []
+          },
+          "jobStatus": {
+            "state": "DONE",
+            "error": null,
+            "additionalErrors": []
+          },
+          "jobStatistics": {
+            "createTime": "2020-08-01T01:25:36.782000+00:00",
+            "startTime": "2020-08-01T01:25:36.943000+00:00",
+            "endTime": "2020-08-01T01:25:38.521000+00:00",
+            "totalProcessedBytes": null,
+            "totalBilledBytes": null,
+            "billingTier": null,
+            "totalSlotMs": 353,
+            "reservationUsage": [
+              {
+                "name": "default-pipeline",
+                "slotMs": 353
+              }
+            ],
+            "referencedTables": [],
+            "totalTablesProcessed": null,
+            "referencedViews": [],
+            "totalViewsProcessed": null,
+            "queryOutputRowCount": null,
+            "totalLoadOutputBytes": 88392
+          }
+        }
+      },
+      "tableDataReadEvents": []
+    }
+  },
+  "textPayload": null,
+  "timestamp": "2020-08-01T01:25:38.539000+00:00",
+  "receiveTimestamp": "2020-08-01T01:25:38.609148+00:00",
+  "severity": "INFO",
+  "insertId": "yyrtvue1pcq9",
+  "httpRequest": null,
+  "operation": null,
+  "trace": null,
+  "spanId": null,
+  "traceSampled": null,
+  "sourceLocation": null
+}

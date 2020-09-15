@@ -9,14 +9,13 @@ from typing import Dict, Any, List
 class ConfigSource:
     project: str
     dataset: str
-    table: str
 
     @classmethod
     def parse(cls, yaml: Dict[str, Any]):
+        """Parse dict derives from YAML."""
         config_source = ConfigSource(
             project=yaml["project"],
             dataset=yaml["dataset"],
-            table=yaml.get("table", "cloudaudit_googleapis_com_data_access_")
         )
         return config_source
 
@@ -30,6 +29,7 @@ class Config:
 
     @classmethod
     def parse(cls, yaml: Dict[str, Any]):
+        """Parse dict derives from YAML."""
         sources = [ConfigSource.parse(source) for source in yaml.get("sources", [])]
         config = Config(
             start=yaml["start"],
