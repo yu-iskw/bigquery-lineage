@@ -82,7 +82,7 @@ jobs:
       - run:
           name: Set up
           command: |
-            pip install -r requirements/requirements-dev.txt
+            make setup
       - run:
           name: Find unsecure modules with safety
           command: |
