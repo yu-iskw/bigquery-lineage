@@ -15,3 +15,4 @@ insert_jobs AS (
 )
 
 SELECT * FROM insert_jobs
+LIMIT {{ limit|default(100000, true)}}
