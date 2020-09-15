@@ -87,13 +87,13 @@ jobs:
       - run:
           <<: *install-libraries
       - run:
-          name: Lint python
-          command: |
-            make lint-python
-      - run:
           name: Set up
           command: |
             make setup
+      - run:
+          name: Lint python
+          command: |
+            make lint-python
       - run:
           name: Find unsecure modules with safety
           command: |
