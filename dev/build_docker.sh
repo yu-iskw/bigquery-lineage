@@ -18,7 +18,7 @@ if [[ "$mode" != "build" ]] && [[ "$mode" != "push" ]] ; then
 fi
 
 # Get the docker image name
-docker_image="yuiskw/bigquery-lineage:${docker_tag}"
+docker_image="${DOCKER_TAG_BASE}:${docker_tag}"
 
 # Build docker image
 docker build --rm \

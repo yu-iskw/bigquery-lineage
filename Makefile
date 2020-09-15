@@ -9,6 +9,10 @@ lint: lint-shell
 lint-shell:
 	shellcheck ./dev/*.sh
 
+.PHONY: lint-python
+lint-python:
+	pylint -v bigquery_lineage tests
+
 .PHONEY: test
 test:
 	pytest -v -s --cache-clear tests/

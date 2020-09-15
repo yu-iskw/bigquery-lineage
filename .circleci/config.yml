@@ -76,9 +76,9 @@ jobs:
       - run:
           <<: *install-libraries
       - run:
-          name: Lint shell
+          name: Lint python
           command: |
-            make lint-shell
+            make lint-python
       - run:
           name: Set up
           command: |
