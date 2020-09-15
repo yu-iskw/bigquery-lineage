@@ -15,7 +15,7 @@ references:
     python-image: &python-image
       working_directory: *working_directory
       docker:
-        - image: python:3.8
+        - image: circleci/python:3.8.5
           environment:
             <<: *common-env-vars
     hadolint: &hadolint-image
