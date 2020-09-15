@@ -9,7 +9,7 @@ references:
     DOCKERHUB_USER: "yuiskw"
 
   working_directory: &working_directory
-    /workspace/project
+    ~/project
 
   docker-images:
     python-image: &python-image
@@ -158,6 +158,7 @@ workflows:
               ignore: /.*/
           requires:
             - lint-shell
+            - lint-dockerfiles
             - lint-and-test-python
       - push-docker:
           # Trigger when tagging
@@ -168,4 +169,5 @@ workflows:
               only: /.*/
           requires:
             - lint-shell
+            - lint-dockerfiles
             - lint-and-test-python
