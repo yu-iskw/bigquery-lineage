@@ -101,7 +101,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker:
-          docker_layer_caching: false
+          version: 19.03.12
       - run:
           <<: *activate-dockerhub
       - run:
@@ -115,7 +115,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker:
-          docker_layer_caching: false
+          version: 19.03.12
       - run:
           <<: *activate-dockerhub
       - run:
@@ -150,6 +150,7 @@ workflows:
             tags:
               only: /.*/
       - build-docker:
+          # Trigger in any branch
           filters:
             branches:
               only: /.*/
@@ -159,9 +160,10 @@ workflows:
             - lint-shell
             - lint-and-test-python
       - push-docker:
+          # Trigger when tagging
           filters:
             branches:
-              ignore: /.*
+              ignore: /.*/
             tags:
               only: /.*/
           requires:
