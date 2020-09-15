@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=line-too-long
 from __future__ import absolute_import, division, print_function
 
 import os
 import unittest
 
-from bigquery_lineage.auditlog import Auditlog
+from bigquery_lineage.auditlog.auditlog import Auditlog
 from bigquery_lineage.utils import (
     get_project_root, load_json
 )

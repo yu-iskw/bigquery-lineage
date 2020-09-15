@@ -60,6 +60,7 @@ class BigQueryDataCollector:
                 project=project, query=query, job_config=self._job_config)
             if dry_run is False:
                 saved_path = self.save_results(path=self._output, query_job=query_job)
+                # pylint: disable=logging-not-lazy
                 logger.info("Saved at %s" % saved_path)
 
     @staticmethod

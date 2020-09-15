@@ -12,6 +12,7 @@ from bigquery_lineage.utils import load_yaml
 
 @click.group()
 @click.pass_context
+# pylint: disable=unused-argument
 def data(context):
     """Commands for collecting data"""
 

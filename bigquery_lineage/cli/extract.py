@@ -7,7 +7,6 @@ from typing import List
 
 import click
 
-from bigquery_lineage.auditlog import Auditlog
 from bigquery_lineage.data.bigquery import AUDITLOG_FILE_NAME, BigQueryDataCollector
 
 

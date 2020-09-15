@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
+# pylint: disable=invalid-name
 from __future__ import absolute_import, division, print_function
 
 from dataclasses import dataclass
-from pprint import pprint
 from typing import Dict, Any, List
 
 
@@ -36,9 +36,6 @@ class JobCompleteEvent:
 
             @classmethod
             def parse(cls, block: Dict[str, Any]):
-                destinationTable = BigQueryTable(
-                    project=block.get("destinationTable")
-                )
                 return JobCompleteEvent.JobConfiguration.Load(
                     sourceUris=block.get("sourceUris", []),
                     destinationTable=BigQueryTable.parse(block.get("destinationTable", {})),
