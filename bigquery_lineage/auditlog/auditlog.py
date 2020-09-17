@@ -3,7 +3,7 @@
 from __future__ import absolute_import, division, print_function
 
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Dict, Any, List
 
 

@@ -7,6 +7,7 @@ from typing import List, Tuple
 import pydot
 
 from bigquery_lineage.auditlog.auditlog import Auditlog
+from bigquery_lineage.config import Config
 
 COLOR_SCHEME = "gnbu6"
 COLOR_GCP = None
@@ -66,14 +67,23 @@ def get_bigquery_full_table_id(project: str, dataset: str, table: str) -> str:
 
 @dataclass()
 class PydotBuilderV1:
+    config: Config
     bigquery_references: List[Tuple[Tuple[str, str, str], Tuple[str, str, str]]] = None
 
+    # pylint: disable=inconsistent-return-statements
     def update(self, auditlog: Auditlog):
         """Update reference relationships."""
+        email = auditlog.protopayload_auditlog.authenticationInfo.principalEmail
+        if self.config.filters.is_excluded_principal_email(email):
+            return None
+        print(email)
+
+        # Update with jobCompletedEvent.query
         self.update_with_job_completed_event_query(auditlog=auditlog)
 
+    # pylint: disable=inconsistent-return-statements
     def update_with_job_completed_event_query(self, auditlog: Auditlog):
-        """Update reference relationships with JobCompletedEvent.query."""
+        """Update reference relationships with jobCompletedEvent.query."""
         job_statistics = (auditlog.protopayload_auditlog.servicedata_v1_bigquery
                           .jobCompletedEvent.jobStatistics)
         query = (auditlog.protopayload_auditlog.servicedata_v1_bigquery
@@ -120,6 +130,7 @@ class PydotBuilderV1:
         graph = pydot.Dot(
             graph_name="Google Cloud Platform",
             label="Google Cloud Platform",
+            overlap=False,
             graph_type="digraph",
             rankdir="LR")
         subgraph_bq = create_bigquery_cluster()
@@ -176,6 +187,7 @@ class PydotBuilderV1:
                 subgraph_bq.add_edge(edge)
 
         # Link subgraphs
+        # pylint: disable=consider-iterating-dictionary
         for project in subgraph_bq_projects.keys():
             subgraph_project = subgraph_bq_projects[project]["subgraph"]
             for dataset in subgraph_bq_projects[project]["datasets"].keys():

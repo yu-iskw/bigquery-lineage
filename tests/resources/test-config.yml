@@ -8,3 +8,11 @@ sources:
     dataset: "audit_log"
   - project: "gcp-project-2"
     dataset: "bigquery_auditlog"
+
+filters:
+  excluded_tables:
+    - ".*\\.excluded_dataset_01\\..*"
+    - ".*\\.excluded_dataset_02\\..*"
+  excluded_principal_emails:
+    - ".*@example1.com"
+    - ".*@example2.com"
