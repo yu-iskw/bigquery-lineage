@@ -2,8 +2,16 @@
 # pylint: disable=invalid-name
 from __future__ import absolute_import, division, print_function
 
-from dataclasses import dataclass
+import json
+from dataclasses import dataclass, field
 from typing import Dict, Any, List
+
+
+def read_auditlog(file: str):
+    """Read a file of auditlog."""
+    with open(file, "r") as fp:
+        for line in fp:
+            yield Auditlog.parse(json.loads(line))
 
 
 @dataclass()
@@ -12,18 +20,28 @@ class BigQueryTable:
     dataset: str = None
     table: str = None
 
+    def __str__(self):
+        """Convert to str."""
+        return '{}.{}.{}'.format(self.project, self.dataset, self.table)
+
     @classmethod
     def parse(cls, block: Dict[str, Any]):
+        block = {} if block is None else block
         return BigQueryTable(
             project=block.get("projectId", None),
             dataset=block.get("datasetId", None),
             table=block.get("tableId", None),
         )
 
+    def has_value(self):
+        """Check if an instance has concrete values or not."""
+        return (self.project is not None
+                and self.dataset is not None
+                and self.table is not None)
+
 
 @dataclass()
 class JobCompleteEvent:
-
     @dataclass()
     class JobConfiguration:
         @dataclass()
@@ -94,14 +112,16 @@ class JobCompleteEvent:
             )
 
     # variables
+    eventName: str = None
     jobConfiguration: JobConfiguration = None
     jobStatistics: JobStatistics = None
 
     @classmethod
     def parse(cls, block: Dict[str, Any]):
-        job_configuration = block["job"].get("jobConfiguration", JobCompleteEvent.JobConfiguration())
-        job_statistics = block["job"].get("jobStatistics", JobCompleteEvent.JobStatistics())
+        job_configuration = block["job"].get("jobConfiguration", {}) if "job" in block.keys() else {}
+        job_statistics = block["job"].get("jobStatistics", {}) if "job" in block.keys() else {}
         return JobCompleteEvent(
+            eventName=block.get("eventName", None),
             jobConfiguration=JobCompleteEvent.JobConfiguration.parse(job_configuration),
             jobStatistics=JobCompleteEvent.JobStatistics.parse(job_statistics),
         )
@@ -124,7 +144,10 @@ class ServicedataV1Bigquery:
 
     @classmethod
     def parse(cls, block: Dict[str, Any]):
-        job_completed_event = block.get("jobCompletedEvent", JobCompleteEvent())
+        job_completed_event = (block["jobCompletedEvent"]
+                               if "jobCompletedEvent" in block.keys()
+                                  and block["jobCompletedEvent"] is not None
+                               else {})
         return ServicedataV1Bigquery(
             jobCompletedEvent=JobCompleteEvent.parse(job_completed_event),
         )
@@ -138,11 +161,11 @@ class ProtopayloadAuditlog:
 
     @classmethod
     def parse(cls, block: Dict[str, Any]):
+        servicedata_v1_bigquery = block.get("servicedata_v1_bigquery", {})
         return ProtopayloadAuditlog(
             methodName=block["methodName"],
             authenticationInfo=AuthenticationInfo.parse(block["authenticationInfo"]),
-            servicedata_v1_bigquery=ServicedataV1Bigquery.parse(
-                block.get("servicedata_v1_bigquery", ServicedataV1Bigquery()))
+            servicedata_v1_bigquery=ServicedataV1Bigquery.parse(servicedata_v1_bigquery),
         )
 
 
