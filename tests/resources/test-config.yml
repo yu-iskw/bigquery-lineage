@@ -1,0 +1,20 @@
+---
+start: "2020-01-01"
+end: "2020-08-01"
+limit: 12345
+
+sources:
+  - project: "gcp-project-1"
+    dataset: "audit_log"
+  - project: "gcp-project-2"
+    dataset: "bigquery_auditlog"
+
+filters:
+  excluded_tables:
+    - project_regexp: "^dummy-project-01$"
+      dataset_regexp: "^tmp_$"
+    - project_regexp: "^dummy-project-02$"
+      table_regexp: "^_.*$"
+  excluded_principal_emails:
+    - ".*@example1.com"
+    - ".*@example2.com"

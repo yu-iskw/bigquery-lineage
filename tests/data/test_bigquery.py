@@ -20,14 +20,16 @@ class TestBigQueryDataCollector(unittest.TestCase):
 
     def test_generate_query(self):
         project = "dummy-project-1"
+        dataset = "test_dataset"
         start_date = "2020-01-01"
         end_date = "2020-01-31"
         query = BigQueryDataCollector.generate_query(
             project=project,
+            dataset=dataset,
             start_date=start_date,
             end_date=end_date,
         )
         self.assertTrue(project in query)
+        self.assertTrue(dataset in query)
         self.assertTrue(start_date in query)
         self.assertTrue(end_date in query)
-        print(query)

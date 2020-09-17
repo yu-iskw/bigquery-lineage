@@ -1,5 +1,11 @@
 click==7.1.2
 click-completion==0.5.2
 Jinja2>=2.11
-google-cloud-bigquery>=1.26.0
 dictdiffer==0.8.1
+google-cloud-logging==1.15.1
+google-cloud-bigquery>=1.26.0
+google-api-python-client>=1.12.1
+pydot==1.4.1
+graphviz==0.14.1
+networkx==2.5
+matplotlib==3.3.2

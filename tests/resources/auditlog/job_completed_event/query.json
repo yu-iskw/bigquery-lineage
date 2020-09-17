@@ -1,0 +1,136 @@
+{
+  "logName": "projects/dummy-project/logs/cloudaudit.googleapis.com%2Fdata_access",
+  "resource": {
+    "type": "bigquery_resource",
+    "labels": {
+      "project_id": "dummy-project"
+    }
+  },
+  "protopayload_auditlog": {
+    "serviceName": "bigquery.googleapis.com",
+    "methodName": "jobservice.jobcompleted",
+    "resourceName": "projects/dummy-project/jobs/bqjob_r12b0c2f6394f182d_00000173a751805f_1",
+    "resourceLocation": null,
+    "numResponseItems": null,
+    "status": null,
+    "authenticationInfo": {
+      "principalEmail": "bigquery@dummy-project.iam.gserviceaccount.com",
+      "authoritySelector": null,
+      "serviceAccountKeyName": null,
+      "serviceAccountDelegationInfo": []
+    },
+    "authorizationInfo": [],
+    "requestMetadata": {
+      "callerIp": "35.200.59.70",
+      "callerSuppliedUserAgent": "google-cloud-sdk294.0.0 google-api-python-client/1.7.10 (gzip),gzip(gfe)",
+      "callerNetwork": "//compute.googleapis.com/projects/vpc/global/networks/__unknown__",
+      "requestAttributes": null,
+      "destinationAttributes": null
+    },
+    "servicedata_v1_bigquery": {
+      "tableInsertRequest": null,
+      "tableUpdateRequest": null,
+      "datasetListRequest": null,
+      "datasetInsertRequest": null,
+      "datasetUpdateRequest": null,
+      "jobInsertRequest": null,
+      "jobQueryRequest": null,
+      "jobGetQueryResultsRequest": null,
+      "tableDataListRequest": null,
+      "setIamPolicyRequest": null,
+      "tableInsertResponse": null,
+      "tableUpdateResponse": null,
+      "datasetInsertResponse": null,
+      "datasetUpdateResponse": null,
+      "jobInsertResponse": null,
+      "jobQueryResponse": null,
+      "jobGetQueryResultsResponse": null,
+      "jobQueryDoneResponse": null,
+      "policyResponse": null,
+      "jobCompletedEvent": {
+        "eventName": "query_job_completed",
+        "job": {
+          "jobName": {
+            "projectId": "dummy-project",
+            "jobId": "bqjob_r12b0c2f6394f182d_00000173a751805f_1",
+            "location": "US"
+          },
+          "jobConfiguration": {
+            "query": {
+              "query": "select 'dummy-project' as project_id, timestamp('2020-07-31 23:59:54') as ts_bash, current_timestamp() as ts_bigquery, timestamp_diff(current_timestamp(), timestamp('2020-07-31 23:59:54'), second) as seconds union all select * from dummy-project.data_quality.analytics",
+              "destinationTable": {
+                "projectId": "dummy-project",
+                "datasetId": "destination_dataset",
+                "tableId": "destination_table"
+              },
+              "createDisposition": "CREATE_IF_NEEDED",
+              "writeDisposition": "WRITE_TRUNCATE",
+              "defaultDataset": null,
+              "tableDefinitions": [],
+              "queryPriority": "QUERY_INTERACTIVE",
+              "destinationTableEncryption": null,
+              "statementType": "SELECT"
+            },
+            "load": null,
+            "extract": null,
+            "tableCopy": null,
+            "dryRun": null,
+            "labels": []
+          },
+          "jobStatus": {
+            "state": "DONE",
+            "error": null,
+            "additionalErrors": []
+          },
+          "jobStatistics": {
+            "createTime": "2020-08-01T00:00:03.825000+00:00",
+            "startTime": "2020-08-01T00:00:04.500000+00:00",
+            "endTime": "2020-08-01T00:00:05.582000+00:00",
+            "totalProcessedBytes": 2219000,
+            "totalBilledBytes": 10485760,
+            "billingTier": 1,
+            "totalSlotMs": 1287,
+            "reservationUsage": [
+              {
+                "name": "projects/bigquery-admin/prod2",
+                "slotMs": 89
+              },
+              {
+                "name": "projects/bigquery-admin/prod3",
+                "slotMs": 701
+              },
+              {
+                "name": "projects/bigquery-admin/prod4",
+                "slotMs": 496
+              }
+            ],
+            "referencedTables": [
+              {
+                "projectId": "dummy-project",
+                "datasetId": "data_quality",
+                "tableId": "table1"
+              }
+            ],
+            "totalTablesProcessed": 1,
+            "referencedViews": [],
+            "totalViewsProcessed": null,
+            "queryOutputRowCount": 44381,
+            "totalLoadOutputBytes": null
+          }
+        }
+      },
+      "tableDataReadEvents": []
+    }
+  },
+  "textPayload": null,
+  "timestamp": "2020-08-01T00:00:05.596000+00:00",
+  "receiveTimestamp": "2020-08-01T00:00:06.619930+00:00",
+  "severity": "INFO",
+  "insertId": "-13ctgme1nesu",
+  "httpRequest": null,
+  "operation": null,
+  "trace": null,
+  "spanId": null,
+  "traceSampled": null,
+  "sourceLocation": null
+}
