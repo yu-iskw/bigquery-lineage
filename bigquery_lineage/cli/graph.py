@@ -10,6 +10,7 @@ import click
 from bigquery_lineage.auditlog.auditlog import read_auditlog
 from bigquery_lineage.auditlog.pydot_builder import PydotBuilderV1
 from bigquery_lineage.data.bigquery import AUDITLOG_FILE_NAME
+from bigquery_lineage.logger import get_logger
 
 
 @click.group()
@@ -28,12 +29,15 @@ def pydot(
         output: str,
         format: str):
     """Visualize a graph with pydot."""
+    logger = get_logger()
+
     files = find_auditlog_files(data_dir=data_dir)
     builder = PydotBuilderV1()
     for file in files:
-        # audit_logs = BigQueryDataCollector.load_audit_logs(file)
+        logger.info("Read {}".format(file))
         for auditlog in read_auditlog(file=file):
             builder.update(auditlog=auditlog)
+    logger.info("Build a graph to {}".format(os.path.abspath(output)))
     graph = builder.build()
     graph.write(path=output, format=format)
 

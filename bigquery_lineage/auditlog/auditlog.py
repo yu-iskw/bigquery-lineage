@@ -15,7 +15,7 @@ def read_auditlog(file: str):
 
 
 @dataclass()
-class BigQueryTable:
+class BigQueryTableOrView:
     project: str = None
     dataset: str = None
     table: str = None
@@ -27,7 +27,7 @@ class BigQueryTable:
     @classmethod
     def parse(cls, block: Dict[str, Any]):
         block = {} if block is None else block
-        return BigQueryTable(
+        return BigQueryTableOrView(
             project=block.get("projectId", None),
             dataset=block.get("datasetId", None),
             table=block.get("tableId", None),
@@ -48,7 +48,7 @@ class JobCompleteEvent:
         class Load:
             # variables
             sourceUris: List[str] = None
-            destinationTable: BigQueryTable = None
+            destinationTable: BigQueryTableOrView = None
             createDisposition: str = None
             writeDisposition: str = None
 
@@ -56,7 +56,7 @@ class JobCompleteEvent:
             def parse(cls, block: Dict[str, Any]):
                 return JobCompleteEvent.JobConfiguration.Load(
                     sourceUris=block.get("sourceUris", []),
-                    destinationTable=BigQueryTable.parse(block.get("destinationTable", {})),
+                    destinationTable=BigQueryTableOrView.parse(block.get("destinationTable", {})),
                     createDisposition=block.get("createDisposition", None),
                     writeDisposition=block.get("writeDisposition", None),
                 )
@@ -65,7 +65,7 @@ class JobCompleteEvent:
         class Query:
             # variables
             query: str = None
-            destinationTable: BigQueryTable = None
+            destinationTable: BigQueryTableOrView = None
             createDisposition: str = None
             writeDisposition: str = None
 
@@ -73,7 +73,7 @@ class JobCompleteEvent:
             def parse(cls, block: Dict[str, Any]):
                 return JobCompleteEvent.JobConfiguration.Query(
                     query=block.get("query", None),
-                    destinationTable=BigQueryTable.parse(block.get("destinationTable", {})),
+                    destinationTable=BigQueryTableOrView.parse(block.get("destinationTable", {})),
                     createDisposition=block.get("createDisposition", None),
                     writeDisposition=block.get("writeDisposition", None),
                 )
@@ -97,7 +97,8 @@ class JobCompleteEvent:
         createTime: str = None
         startTime: str = None
         endTime: str = None
-        referencedTables: List[BigQueryTable] = None
+        referencedTables: List[BigQueryTableOrView] = None
+        referencedViews: List[BigQueryTableOrView] = None
 
         @classmethod
         def parse(cls, block: Dict[str, Any]):
@@ -106,9 +107,13 @@ class JobCompleteEvent:
                 startTime=block.get("startTime", None),
                 endTime=block.get("endTime", None),
                 referencedTables=[
-                    BigQueryTable(project=table["projectId"], dataset=table["datasetId"], table=table["tableId"])
+                    BigQueryTableOrView(project=table["projectId"], dataset=table["datasetId"], table=table["tableId"])
                     for table in block.get("referencedTables", [])
-                ]
+                ],
+                referencedViews=[
+                    BigQueryTableOrView(project=view["projectId"], dataset=view["datasetId"], table=view["tableId"])
+                    for view in block.get("referencedViews", [])
+                ],
             )
 
     # variables

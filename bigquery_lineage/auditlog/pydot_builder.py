@@ -9,18 +9,32 @@ import pydot
 from bigquery_lineage.auditlog.auditlog import Auditlog
 
 
-def create_bigquery_project_cluster(project: str) -> pydot.Subgraph:
+COLOR_GCP = "pastel25/5"
+COLOR_BQ = "pastel25/4"
+COLOR_BQ_PROJECT = "pastel25/3"
+COLOR_BQ_DATASET = "pastel25/2"
+COLOR_BQ_TABLE = "pastel25/1"
+
+
+def create_bigquery_project_cluster(project: str) -> pydot.Cluster:
     """Create a cluster of a BigQuery project."""
     name = "cluster_bq_project_{}".format(project)
     label = project
-    return pydot.Subgraph(name=name, label=label, color="black")
+    return pydot.Cluster(graph_name=name, label=label, color=COLOR_BQ_PROJECT, style="filled")
 
 
-def create_dataset_project_cluster(project:str, dataset: str) -> pydot.Subgraph:
+def create_dataset_project_cluster(project: str, dataset: str) -> pydot.Cluster:
     """Create a cluster of a BigQuery dataset."""
     name = "cluster_bq_dataset_{}_{}".format(project, dataset)
     label = "{}.{}".format(project, dataset)
-    return pydot.Subgraph(name=name, label=label, color="black")
+    dataset_cluster = pydot.Cluster(graph_name=name, label=label, color=COLOR_BQ_DATASET, style="filled")
+    return dataset_cluster
+
+
+def create_bigquery_table_node(project: str, dataset: str, table: str) -> pydot.Node:
+    """Create a node of BigQuery table."""
+    table_id = get_bigquery_full_table_id(project=project, dataset=dataset, table=table)
+    return pydot.Node(name=table_id, label=table_id, shape="box", color=COLOR_BQ_TABLE, style="filled")
 
 
 def get_bigquery_full_table_id(project: str, dataset: str, table: str) -> str:
@@ -42,31 +56,41 @@ class PydotBuilderV1:
                           .jobCompletedEvent.jobStatistics)
         query = (auditlog.protopayload_auditlog.servicedata_v1_bigquery
                  .jobCompletedEvent.jobConfiguration.query)
+
+        # Check if a destination table exists.
+        if not query.destinationTable.has_value():
+            return None
+
+        # Initialize the array just in case, if necessary.
+        if self.bigquery_references is None:
+            self.bigquery_references = []
+
+        # Destination node
+        destination_node_key = (
+            query.destinationTable.project,
+            query.destinationTable.dataset,
+            query.destinationTable.table)
+        # Loop over referenced tables.
         if (job_statistics.referencedTables is not None
-                and len(job_statistics.referencedTables) > 0
-                and query.destinationTable.project is not None
-                and query.destinationTable.dataset is not None
-                and query.destinationTable.table is not None):
-            # Destination node
-            destination_node_key = (
-                query.destinationTable.project,
-                query.destinationTable.dataset,
-                query.destinationTable.table)
+                and len(job_statistics.referencedTables) > 0):
             # Source nodes
-            for referenced_table in job_statistics.referencedTables:
-                if (referenced_table.project is None
-                        or referenced_table.dataset is None
-                        or referenced_table.table is None):
-                    continue
-                # Source node
-                source_node_key = (
-                    referenced_table.project,
-                    referenced_table.dataset,
-                    referenced_table.table
-                )
-                # Append a reference relationship.
-                if self.bigquery_references is None:
-                    self.bigquery_references = []
+            source_node_keys = [
+                (referenced_table.project, referenced_table.dataset, referenced_table.table)
+                for referenced_table in job_statistics.referencedTables
+                if referenced_table.has_value()
+            ]
+            for source_node_key in source_node_keys:
+                self.bigquery_references.append((source_node_key, destination_node_key))
+        # Loop over referenced views.
+        if (job_statistics.referencedViews is not None
+                and len(job_statistics.referencedViews) > 0):
+            # Source nodes
+            source_node_keys = [
+                (referenced_view.project, referenced_view.dataset, referenced_view.table)
+                for referenced_view in job_statistics.referencedTables
+                if referenced_view.has_value()
+            ]
+            for source_node_key in source_node_keys:
                 self.bigquery_references.append((source_node_key, destination_node_key))
 
     def build(self) -> pydot.Dot:
@@ -74,21 +98,18 @@ class PydotBuilderV1:
         graph = pydot.Dot(
             graph_name="Google Cloud Platform",
             graph_type="digraph",
+            color=COLOR_GCP,
+            style="filled",
             rankdir="LR")
-        subgraph_bq = pydot.Subgraph(
+        subgraph_bq = pydot.Cluster(
             graph_name="cluster_BigQuery",
             graph_type="digraph",
+            color=COLOR_BQ,
+            style="filled",
             label="BigQuery")
 
-        # {
-        #     'sage-shard-740': {
-        #         'subgraph': pydot.Subgraph,
-        #         'datasets': {
-        #             'sage-shard-740.anon_us': pydot.Subgraph,
-        #         }
-        #     }
-        # }
         subgraph_bq_projects = {}
+        table_nodes = {}
         # Create nodes and edges
         for bq_reference in self.bigquery_references:
             ((src_project, src_dataset, src_table),
@@ -96,7 +117,7 @@ class PydotBuilderV1:
             # Initialize a BigQuery project for source.
             if src_project not in subgraph_bq_projects:
                 subgraph_bq_projects[src_project] = {
-                   'subgraph': create_bigquery_project_cluster(project=src_project),
+                    'subgraph': create_bigquery_project_cluster(project=src_project),
                     'datasets': {},
                 }
             # Initialize a BigQuery dataset for source.
@@ -117,15 +138,19 @@ class PydotBuilderV1:
             # Create source and destination nodes.
             source_node_id = get_bigquery_full_table_id(
                 project=src_project, dataset=src_dataset, table=src_table)
-            source_node = pydot.Node(name=source_node_id, label=source_node_id)
+            source_id = table_nodes.get(
+                source_node_id,
+                create_bigquery_table_node(project=src_project, dataset=src_dataset, table=src_table))
             destination_node_id = get_bigquery_full_table_id(
                 project=dst_project, dataset=dst_dataset, table=dst_table)
-            destination_node = pydot.Node(name=destination_node_id, label=destination_node_id)
+            destination_node = table_nodes.get(
+                destination_node_id,
+                create_bigquery_table_node(project=dst_project, dataset=dst_dataset, table=dst_table))
             # Register the nodes.
-            subgraph_bq_projects[src_project]["datasets"][src_dataset].add_node(source_node)
+            subgraph_bq_projects[src_project]["datasets"][src_dataset].add_node(source_id)
             subgraph_bq_projects[dst_project]["datasets"][dst_dataset].add_node(destination_node)
             # Create an edge.
-            edge = pydot.Edge(source_node, destination_node)
+            edge = pydot.Edge(source_id, destination_node)
             # Register the edge.
             if src_project == dst_project and src_dataset == dst_dataset:
                 subgraph_bq_projects[src_project]["datasets"][src_dataset].add_edge(edge)
