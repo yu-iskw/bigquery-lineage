@@ -8,33 +8,55 @@ import pydot
 
 from bigquery_lineage.auditlog.auditlog import Auditlog
 
+COLOR_SCHEME = "gnbu6"
+COLOR_GCP = None
+COLOR_BQ = "4"
+COLOR_BQ_PROJECT = "3"
+COLOR_BQ_DATASET = "2"
+COLOR_BQ_TABLE = "1"
 
-COLOR_GCP = "pastel25/5"
-COLOR_BQ = "pastel25/4"
-COLOR_BQ_PROJECT = "pastel25/3"
-COLOR_BQ_DATASET = "pastel25/2"
-COLOR_BQ_TABLE = "pastel25/1"
+
+def create_bigquery_cluster() -> pydot.Cluster:
+    """Create a cluster of BigQuery"""
+    name = "cluster_BigQuery"
+    label = "BigQuery"
+    cluster = pydot.Cluster(graph_name=name, label=label,
+                            colorscheme=COLOR_SCHEME, fillcolor=COLOR_BQ,
+                            style="filled,setlinewidth(0)")
+    cluster.set_node_defaults(
+        shape="box",
+        fillcolor=COLOR_BQ_TABLE,
+        style="filled,setlinewidth(0)",
+        colorscheme=COLOR_SCHEME)
+    return cluster
 
 
 def create_bigquery_project_cluster(project: str) -> pydot.Cluster:
     """Create a cluster of a BigQuery project."""
     name = "cluster_bq_project_{}".format(project)
-    label = project
-    return pydot.Cluster(graph_name=name, label=label, color=COLOR_BQ_PROJECT, style="filled")
+    label = "BigQuery project: {}".format(project)
+    cluster = pydot.Cluster(graph_name=name, label=label,
+                            colorscheme=COLOR_SCHEME, fillcolor=COLOR_BQ_PROJECT,
+                            style="filled,setlinewidth(0)")
+    return cluster
 
 
 def create_dataset_project_cluster(project: str, dataset: str) -> pydot.Cluster:
     """Create a cluster of a BigQuery dataset."""
     name = "cluster_bq_dataset_{}_{}".format(project, dataset)
-    label = "{}.{}".format(project, dataset)
-    dataset_cluster = pydot.Cluster(graph_name=name, label=label, color=COLOR_BQ_DATASET, style="filled")
-    return dataset_cluster
+    label = "BigQuery dataset: {}.{}".format(project, dataset)
+    cluster = pydot.Cluster(graph_name=name, label=label,
+                            colorscheme=COLOR_SCHEME, fillcolor=COLOR_BQ_DATASET,
+                            style="filled,setlinewidth(0)")
+    return cluster
 
 
 def create_bigquery_table_node(project: str, dataset: str, table: str) -> pydot.Node:
     """Create a node of BigQuery table."""
-    table_id = get_bigquery_full_table_id(project=project, dataset=dataset, table=table)
-    return pydot.Node(name=table_id, label=table_id, shape="box", color=COLOR_BQ_TABLE, style="filled")
+    full_table_id = get_bigquery_full_table_id(project=project, dataset=dataset, table=table)
+    label = table
+    node = pydot.Node(name=full_table_id, label=label)
+    return node
 
 
 def get_bigquery_full_table_id(project: str, dataset: str, table: str) -> str:
@@ -97,16 +119,10 @@ class PydotBuilderV1:
         """Build a graph."""
         graph = pydot.Dot(
             graph_name="Google Cloud Platform",
+            label="Google Cloud Platform",
             graph_type="digraph",
-            color=COLOR_GCP,
-            style="filled",
             rankdir="LR")
-        subgraph_bq = pydot.Cluster(
-            graph_name="cluster_BigQuery",
-            graph_type="digraph",
-            color=COLOR_BQ,
-            style="filled",
-            label="BigQuery")
+        subgraph_bq = create_bigquery_cluster()
 
         subgraph_bq_projects = {}
         table_nodes = {}
