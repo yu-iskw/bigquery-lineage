@@ -27,17 +27,19 @@ def graph(context):
 @click.option("--config", type=click.Path(exists=True), required=True)
 @click.option("--output", type=str, required=True)
 @click.option("--fmt", type=str, required=False, default="png")
+@click.option("--verbose", type=bool, required=False, default=False)
 def pydot(
         data_dir: str,
         config: str,
         output: str,
-        fmt: str):
+        fmt: str,
+        verbose: bool):
     """Visualize a graph with pydot."""
     logger = get_logger()
 
     bql_config = Config.load(path=config)
     files = find_auditlog_files(data_dir=data_dir)
-    builder = PydotBuilderV1(config=bql_config)
+    builder = PydotBuilderV1(config=bql_config, verbose=verbose)
     for file in files:
         logger.info("Read {}".format(file))
         for auditlog in read_auditlog(file=file):

@@ -1,16 +1,24 @@
 ---
-start: "2020-09-01"
+start: "2020-08-01"
 end: "2020-09-14"
 limit: 100000
 
 sources:
-  - project: "dummy-project-01"
-    dataset: "dataset_01"
+  - project: "project-01"
+    dataset: "bigquery_resource_log"
+  - project: "project-02"
+    dataset: "source__cloudaudit__bigquery"
 
 filters:
   excluded_principal_emails:
-    - "bot"
-    - "png"
     - "@example.com"
   excluded_tables:
-    - ".*\\.excluded_dataset\\..*"
+    - dataset_regexp: "^_.*$"
+    - dataset_regexp: "^tmp.*$"
+    - dataset_regexp: "^temp.*$"
+    - dataset_regexp: "looker"
+    - table_regexp: "^tmp_"
+    - table_regexp: "^temp_"
+    - table_regexp: "^stg_"
+    - table_regexp: "^__TABLES__$"
+    - table_regexp: "^z_"

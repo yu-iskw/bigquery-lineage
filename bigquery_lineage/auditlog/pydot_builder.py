@@ -69,6 +69,7 @@ def get_bigquery_full_table_id(project: str, dataset: str, table: str) -> str:
 class PydotBuilderV1:
     config: Config
     bigquery_references: List[Tuple[Tuple[str, str, str], Tuple[str, str, str]]] = None
+    verbose: bool = False
 
     # pylint: disable=inconsistent-return-statements
     def update(self, auditlog: Auditlog):
@@ -76,7 +77,9 @@ class PydotBuilderV1:
         email = auditlog.protopayload_auditlog.authenticationInfo.principalEmail
         if self.config.filters.is_excluded_principal_email(email):
             return None
-        print(email)
+
+        if self.verbose is True:
+            print(email)
 
         # Update with jobCompletedEvent.query
         self.update_with_job_completed_event_query(auditlog=auditlog)
@@ -153,7 +156,9 @@ class PydotBuilderV1:
         for bq_reference in set(self.bigquery_references):
             ((src_project, src_dataset, src_table),
              (dst_project, dst_dataset, dst_table)) = bq_reference
-            print(bq_reference)
+
+            if self.verbose is True:
+                print(bq_reference)
 
             # Create a source table ID and a destination table ID
             source_node_id = get_bigquery_full_table_id(
