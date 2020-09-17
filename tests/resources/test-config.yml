@@ -11,8 +11,10 @@ sources:
 
 filters:
   excluded_tables:
-    - ".*\\.excluded_dataset_01\\..*"
-    - ".*\\.excluded_dataset_02\\..*"
+    - project_regexp: "^dummy-project-01$"
+      dataset_regexp: "^tmp_$"
+    - project_regexp: "^dummy-project-02$"
+      table_regexp: "^_.*$"
   excluded_principal_emails:
     - ".*@example1.com"
     - ".*@example2.com"

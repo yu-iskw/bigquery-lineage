@@ -30,13 +30,34 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(config.sources[1].dataset, "bigquery_auditlog")
 
         # test filters
-        self.assertEqual(config.filters.excluded_tables,
-                         ['.*\\.excluded_dataset_01\\..*', '.*\\.excluded_dataset_02\\..*'])
-        self.assertEqual(config.filters.excluded_principal_emails,
-                         ['.*@example1.com', '.*@example2.com'])
+        expected = [
+            ConfigFilters.ExcludedTable(project_regexp='^dummy-project-01$', dataset_regexp='^tmp_$'),
+            ConfigFilters.ExcludedTable(project_regexp='^dummy-project-02$', table_regexp='^_.*$'),
+        ]
+        self.assertEqual(config.filters.excluded_tables, expected)
+        expected = ['.*@example1.com', '.*@example2.com']
+        self.assertEqual(config.filters.excluded_principal_emails, expected)
 
 
 class TestConfigFilters(unittest.TestCase):
+
+    def test_is_excluded_table(self):
+        target_table_ids = [
+            ("dummy-project-01", "dataset_01", "table"),
+            ("dummy-project-02", "dataset_02", "table"),
+            ("dummy-project-03", "dataset_03", "table"),
+        ]
+        excluded_tables = [
+            {"project_regexp": "dummy-project-01"},
+            {"dataset_regexp": "dataset_03"},
+        ]
+        excluded_tables = [ConfigFilters.ExcludedTable(**x) for x in excluded_tables]
+        filters = ConfigFilters(excluded_tables=excluded_tables)
+        result = [
+            filters.is_excluded_table(project=project, dataset=dataset, table=table)
+            for project, dataset, table in target_table_ids]
+        expected = [True, False, True]
+        self.assertEqual(result, expected)
 
     def test_is_excluded_principal_email(self):
         target_emails = [
